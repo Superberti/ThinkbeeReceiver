@@ -26,23 +26,13 @@ volatile uint32_t MillisCounter=0;
 /* Private variables ---------------------------------------------------------*/
 
 TIM_HandleTypeDef htim2;
-SPI_HandleTypeDef hspi1;
-DMA_HandleTypeDef hdma_spi1_rx;
-DMA_HandleTypeDef hdma_spi1_tx;
-atomic_bool FirstHalfReady=0;
-atomic_bool SecondHalfReady=0;
 
 UART_HandleTypeDef huart2;
 #define SPI_BUF_SIZE 32
-static uint32_t SPIRecBuf[SPI_BUF_SIZE]= {};
-static uint32_t SPITransBuf[SPI_BUF_SIZE]= {};
-static uint8_t HammingBuf[SPI_BUF_SIZE]={};
 static char PrintBuf[80]= {};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
-static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
 
@@ -117,95 +107,86 @@ int main(void)
 
   MX_TIM2_Init();
 
-  /*
-  memset(SPITransBuf,0x55,sizeof(SPITransBuf));
-  memset(SPIRecBuf,0,sizeof(SPIRecBuf));
-
-  if (HAL_SPI_TransmitReceive_DMA(&hspi1, (uint8_t*)SPITransBuf, (uint8_t*)SPIRecBuf, sizeof(SPIRecBuf)) != HAL_OK)
-  {
-    // Starting Error
-    Error_Handler();
-  }*/
-
-
-    while(1)
-    {
-      HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
-      // Insert delay 100 ms
-      HAL_Delay(100);
-    }
-  /*
-  double iMeanHammingWeight=SPI_BUF_SIZE/2;
-  int iMinBufPos;
-  int iMaxBufPos;
-  uint32_t iBitCounter=0;
-  uint32_t iLastBitCounter=0;
-  uint64_t iLastDMACounter=0;
-  uint64_t iDMACounter=0;
-  uint32_t iHammingCounter=0;
+  uint32_t Mikroseconds, UpdateTime, LastTime, TimeDiff, LargestLow=0, LargestHigh=0, PacketCounter=0, PacketCounterLow, PacketCounterHigh;
+  uint32_t PulseTimeHigh=0, PulseTimeLow=0;
+  uint8_t Pin, LastPin;
+  uint32_t TimeDiffs[10];
+  LastTime=GetMicros();//MillisCounter*1000 + TIM2->CNT;
+  UpdateTime=LastTime;
+  LastPin=0;
+  enum ReaderState rs=RS_INIT;
+  struct MinMaxBitTimes HighShort, HighLong, LowShort, LowLong, LowPause;
+  GetBitTimes(HIGH_SHORT, &HighShort);
+  GetBitTimes(HIGH_LONG, &HighLong);
+  GetBitTimes(LOW_SHORT, &LowShort);
+  GetBitTimes(LOW_LONG, &LowLong);
+  GetBitTimes(LOW_PAUSE, &LowPause);
 
   while(1)
   {
-    HAL_NVIC_DisableIRQ(DMA1_Channel2_3_IRQn);
-    //iMeanBufPos=smMeanBufPos;
-    //iMinBufPos=smMinBufPos;
-    //iMaxBufPos=smMaxBufPos;
-    iDMACounter=smDMACounter;
-    HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
-    if (iDMACounter-iLastDMACounter>=10000)
-    {
-      //HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
-      snprintf(PrintBuf, sizeof(PrintBuf), "Mean hamming weight: %d\r\n",iBitCounter/iHammingCounter);
-      SerialOut(PrintBuf);
-      iBitCounter=0;
-      iHammingCounter=0;
-      iLastDMACounter=iDMACounter;
-    }
-    if (FirstHalfReady)
-    {
-      //HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, SPIRecBuf[0]);
-      for (int i=0;i<SPI_BUF_SIZE/2;i++)
-      {
-        iHammingCounter++;
-        iBitCounter+=HammingBuf[i];
-        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, HammingBuf[i]>31);
-        //HammingBuf[i]=SPIRecBuf[i];
-        //iMeanHammingWeight=0.99*iMeanHammingWeight+0.01*HammingBuf[i];
-        //if (HammingBuf[i]>32)
-          //SerialOut("Komischer Puffer 1/2...\r\n");
-      }
-      FirstHalfReady=0;
-    }
-    else if (SecondHalfReady)
-    {
-      //HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, SPIRecBuf[SPI_BUF_SIZE/2]);
-      for (int i=SPI_BUF_SIZE/2;i<SPI_BUF_SIZE;i++)
-      {
-        iHammingCounter++;
-        iBitCounter+=HammingBuf[i];
-        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, HammingBuf[i]>31);
-        //HammingBuf[i]=SPIRecBuf[i];
-        //iMeanHammingWeight=0.99*iMeanHammingWeight+0.01*HammingBuf[i];
-        //if (HammingBuf[i]>32)
-          //SerialOut("Komischer Puffer 2/2...\r\n");
-      }
-      SecondHalfReady=0;
-    }
-  }*/
-
-  uint64_t Mikroseconds, LastTime, TimeDiff;
-  uint64_t DiffTimes[10];
-  uint32_t DiffCounter=0;
-  uint8_t Pin;
-  LastTime=MillisCounter*1000 + TIM2->CNT;
-
-  while(1)
-  {
-    Mikroseconds = MillisCounter*1000 + TIM2->CNT;
+    Mikroseconds = GetMicros();//MillisCounter*1000 + TIM2->CNT;
     Pin=(GPIOB->IDR & GPIO_PIN_4)>0;
-    //GPIO_PinState rfi = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4);
+    // Pin getogglet?
+    if (Pin!=LastPin)
+    {
+      PacketCounter++;
+      TimeDiff=Mikroseconds-LastTime;
+      TimeDiffs[PacketCounter%10]=TimeDiff;
+      /*
+      if (TimeDiff<0)
+      {
+        SerialOut("TimeDiff<0\r\n");
+      }
+      else if (TimeDiff>1000000)
+      {
+        SerialOut("TimeDiff>1000000\r\n");
+      }*/
+      LastTime=Mikroseconds;
+      if (Pin)
+      {
+        PacketCounterLow=PacketCounter;
+        // Übergang Low->High
+        PulseTimeLow=TimeDiff;
+        LargestLow=max(LargestLow,PulseTimeLow);
+        if (TimeDiff>LowPause.Min && TimeDiff<LowPause.Max && rs==RS_HIGH_LONG)
+          rs=RS_LOW_PAUSE;
+        else
+          rs=RS_INIT;
+      }
+      else
+      {
+        PacketCounterHigh=PacketCounter;
+        // Übergang High->Low
+        PulseTimeHigh=TimeDiff;
+        LargestHigh=max(LargestHigh,PulseTimeHigh);
+        if (TimeDiff>HighLong.Min && TimeDiff<HighLong.Max && rs==RS_INIT)
+          rs=RS_HIGH_LONG;
+      }
+      if (rs==RS_LOW_PAUSE)
+      {
+        SerialOut("Thinkbee Paket detektiert!\r\n");
+        rs=RS_INIT;
+      }
+    }
+    /*
+    if (Mikroseconds-UpdateTime>=1000000)
+    {
+      UpdateTime=Mikroseconds;
+      snprintf(PrintBuf,sizeof(PrintBuf),"LargestLow: %u µs LargestHigh: %u µs\r\n", LargestLow, LargestHigh);
+      SerialOut(PrintBuf);
+    }*/
     HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, Pin);
+    LastPin=Pin;
   }
+
+  //GPIO_PinState rfi = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4);
+}
+
+void GetBitTimes(enum BitTimes bt, struct MinMaxBitTimes* aMinMax)
+{
+  int Diff=5;
+  aMinMax->Min=((int)bt*(100-Diff))/100;
+  aMinMax->Max=((int)bt*(100+Diff))/100;
 }
 
 int HammingWeight( uint8_t b )
@@ -214,59 +195,6 @@ int HammingWeight( uint8_t b )
   b = (b & 0x33) + ((b >> 2) & 0x33);
   return (((b + (b >> 4)) & 0x0F) * 0x01);
 }
-
-static int BitCounter;
-void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-  if (SecondHalfReady)
-  {
-    SerialOut("f");
-    return;
-  }
-  uint32_t pos = sizeof(SPIRecBuf) - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
-
-  for (int i=SPI_BUF_SIZE/2;i<SPI_BUF_SIZE;i++)
-  {
-    HammingBuf[i]=__builtin_popcount(SPIRecBuf[i]);
-    //HammingBuf[i] = BitCounter;// BitCounter>26;
-  }
-
-
-  SecondHalfReady=1;
-}
-
-void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi)
-{
-  if (FirstHalfReady)
-  {
-    SerialOut("h");
-    return;
-  }
-  uint32_t pos = sizeof(SPIRecBuf) - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
-
-  for (int i=0;i<SPI_BUF_SIZE/2;i++)
-  {
-    HammingBuf[i]=__builtin_popcount(SPIRecBuf[i]);
-    //HammingBuf[i] = BitCounter;//BitCounter>26;
-  }
-  FirstHalfReady=1;
-  smDMACounter++;
-
-  /*
-  //uint32_t bytesRx = hspi1.hdmarx->Instance->CNDTR;
-
-  uint32_t pos = sizeof(SPIRecBuf) - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
-  //int b=5;
-  if (smMeanBufPos==0.0)
-    smMeanBufPos=pos;
-  else
-    smMeanBufPos=0.9*smMeanBufPos+0.1*pos;
-
-  smMinBufPos=min(smMinBufPos,pos);
-  smMaxBufPos=max(smMaxBufPos,pos);
-*/
-}
-
 
 /**
   * @brief TIM2 Initialization Function
@@ -381,44 +309,6 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief SPI1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI1_Init(void)
-{
-
-  /* USER CODE BEGIN SPI1_Init 0 */
-
-  /* USER CODE END SPI1_Init 0 */
-
-  /* USER CODE BEGIN SPI1_Init 1 */
-
-  /* USER CODE END SPI1_Init 1 */
-  /* SPI1 parameter configuration*/
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 7;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI1_Init 2 */
-
-  /* USER CODE END SPI1_Init 2 */
-
-}
-
-/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -450,22 +340,6 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
-
-}
-
-/**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Channel2_3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
 
 }
 

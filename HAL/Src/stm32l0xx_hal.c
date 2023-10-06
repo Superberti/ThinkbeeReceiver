@@ -221,13 +221,13 @@ __weak void HAL_MspDeInit(void)
 
 /**
   * @brief This function configures the source of the time base:
-  *        The time source is configured  to have 1ms time base with a dedicated 
+  *        The time source is configured  to have 1ms time base with a dedicated
   *        Tick interrupt priority.
   * @note This function is called  automatically at the beginning of program after
   *       reset by HAL_Init() or at any time when clock is reconfigured  by HAL_RCC_ClockConfig().
-  * @note In the default implementation, SysTick timer is the source of time base. 
-  *       It is used to generate interrupts at regular time intervals. 
-  *       Care must be taken if HAL_Delay() is called from a peripheral ISR process, 
+  * @note In the default implementation, SysTick timer is the source of time base.
+  *       It is used to generate interrupts at regular time intervals.
+  *       Care must be taken if HAL_Delay() is called from a peripheral ISR process,
   *       The SysTick interrupt must have higher priority (numerically lower)
   *       than the peripheral interrupt. Otherwise the caller ISR process will be blocked.
   *       The function is declared as __weak  to be overwritten  in case of other
@@ -282,6 +282,7 @@ __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   * @{
   */
 
+
 /**
   * @brief This function is called to increment a global variable "uwTick"
   *        used as application time base.
@@ -314,6 +315,45 @@ __weak uint32_t HAL_GetTick(void)
 uint32_t HAL_GetTickPrio(void)
 {
   return uwTickPrio;
+}
+
+/* HAL Time functions --------------------------------------------------------*/
+
+
+// SysTick does not decrement on microseconds, due to lack of prescaler and limited divider.
+// Scale is adjusted in the return formula.
+// The unmodified example for this code can be found on:
+// https://electronics.stackexchange.com/questions/521020/stm32-create-a-microsecond-timer
+uint32_t GetMicros(void)
+{
+  uint32_t ms;
+  uint32_t st;
+  uint32_t range;
+
+  do  // Retreive SysTick->VAL, retry on a ms transition because that will reload SysTick
+  {
+    ms = HAL_GetTick();
+    st = SysTick->VAL;
+    asm volatile("nop");
+    asm volatile("nop");
+  }
+  while (ms != HAL_GetTick());
+
+  range = (SysTick->LOAD + 1);
+  return (ms * 1000) + ((range - st) / (range / 1000));
+}
+
+uint32_t GetMicrosISR(void)
+{
+  uint32_t st = SysTick->VAL;
+  uint32_t pending = SCB->ICSR & SCB_ICSR_PENDSTSET_Msk;
+  uint32_t ms = HAL_GetTick();
+
+  if (pending == 0)
+    ms++;
+
+  uint32_t range = (SysTick->LOAD + 1);
+  return (ms * 1000) + ((range - st) / (range / 1000));
 }
 
 /**
@@ -441,7 +481,7 @@ uint32_t HAL_GetREVID(void)
   */
 uint32_t HAL_GetDEVID(void)
 {
-   return((DBGMCU->IDCODE) & IDCODE_DEVID_MASK);
+  return((DBGMCU->IDCODE) & IDCODE_DEVID_MASK);
 }
 
 /**
@@ -641,8 +681,8 @@ void HAL_SYSCFG_VREFINT_OutputSelect(uint32_t SYSCFG_Vrefint_OUTPUT)
   */
 void HAL_SYSCFG_Enable_Lock_VREFINT(void)
 {
-    /* Enable the LOCK by setting REF_LOCK bit in the CFGR3 register */
-    SET_BIT(SYSCFG->CFGR3, SYSCFG_CFGR3_REF_LOCK);
+  /* Enable the LOCK by setting REF_LOCK bit in the CFGR3 register */
+  SET_BIT(SYSCFG->CFGR3, SYSCFG_CFGR3_REF_LOCK);
 }
 
 /**
@@ -651,8 +691,8 @@ void HAL_SYSCFG_Enable_Lock_VREFINT(void)
   */
 void HAL_SYSCFG_Disable_Lock_VREFINT(void)
 {
-    /* Disable the LOCK by setting REF_LOCK bit in the CFGR3 register */
-    CLEAR_BIT(SYSCFG->CFGR3, SYSCFG_CFGR3_REF_LOCK);
+  /* Disable the LOCK by setting REF_LOCK bit in the CFGR3 register */
+  CLEAR_BIT(SYSCFG->CFGR3, SYSCFG_CFGR3_REF_LOCK);
 }
 
 /**

@@ -104,6 +104,14 @@ enum BitTimes
   LOW_PAUSE = 600,
 };
 
+struct MinMaxBitTimes
+{
+  uint16_t Min;
+  uint16_t Max;
+};
+
+void GetBitTimes(enum BitTimes bt, struct MinMaxBitTimes*);
+
 
 
 #ifdef __cplusplus

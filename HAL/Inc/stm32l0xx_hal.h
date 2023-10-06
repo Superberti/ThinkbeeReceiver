@@ -422,6 +422,19 @@ uint32_t HAL_GetDEVID(void);
 uint32_t HAL_GetUIDw0(void);
 uint32_t HAL_GetUIDw1(void);
 uint32_t HAL_GetUIDw2(void);
+
+/* HAL Time functions --------------------------------------------------------*/
+#if defined(HAL_IncTick)
+#define GetMillis() HAL_GetTick()
+#define Delay_ms(t) HAL_Delay(t)
+#else
+void SysTick_Handler_custom(void);
+uint32_t GetMillis(void);
+void Delay_ms(uint32_t wait_ms);
+#endif
+
+uint32_t GetMicros(void);
+uint32_t GetMicrosISR(void);
 /**
   * @}
   */

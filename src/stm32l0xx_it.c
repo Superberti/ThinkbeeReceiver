@@ -56,10 +56,6 @@ void Clear_DMA_IRQ(DMA_HandleTypeDef *hdma);
 
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim2;
-extern DMA_HandleTypeDef hdma_spi1_rx;
-extern DMA_HandleTypeDef hdma_spi1_tx;
-extern uint8_t SampleBuf[10];
-extern uint8_t SampleCount;
 uint32_t MillisCounter;
 /* USER CODE BEGIN EV */
 
@@ -152,71 +148,15 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
   //HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_4);
-  MillisCounter++;
+  //MillisCounter++;
   // Ohne HAL: Clear interrrupt Update Flag
-  TIM2->SR = ~TIM_SR_UIF;
+  //TIM2->SR = ~TIM_SR_UIF;
   /* USER CODE END TIM2_IRQn 0 */
-  //HAL_TIM_IRQHandler(&htim2);
+  HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
 
   /* USER CODE END TIM2_IRQn 1 */
 }
 
-/**
-  * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
-  */
-void DMA1_Channel2_3_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel2_3_IRQn 0 */
-  // Beide Interrupts müssen unbedingt bedient werden, da ansonsten der rx/tx-IRQ nicht zurückgesetzt wird!
-  HAL_DMA_IRQHandler(&hdma_spi1_rx);
-  //HAL_DMA_IRQHandler(&hdma_spi1_tx);
-  Clear_DMA_IRQ(&hdma_spi1_tx);
-  /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel2_3_IRQn 1 */
-}
-
 /* USER CODE BEGIN 1 */
-/**
-  * @brief  Clear DMA interrupt request.
-  * @param  hdma pointer to a DMA_HandleTypeDef structure that contains
-  *               the configuration information for the specified DMA Channel.
-  * @retval None
-  */
-void Clear_DMA_IRQ(DMA_HandleTypeDef *hdma)
-{
-  uint32_t flag_it = hdma->DmaBaseAddress->ISR;
-  uint32_t source_it = hdma->Instance->CCR;
 
-  /* Half Transfer Complete Interrupt management ******************************/
-  if ((0U != (flag_it & (DMA_FLAG_HT1 << (hdma->ChannelIndex & 0x1cU)))) && (0U != (source_it & DMA_IT_HT)))
-  {
-    /* Clear the half transfer complete flag */
-    hdma->DmaBaseAddress->IFCR = DMA_ISR_HTIF1 << (hdma->ChannelIndex & 0x1cU);
-  }
-
-  /* Transfer Complete Interrupt management ***********************************/
-  else if ((0U != (flag_it & (DMA_FLAG_TC1 << (hdma->ChannelIndex & 0x1cU)))) && (0U != (source_it & DMA_IT_TC)))
-  {
-    /* Clear the transfer complete flag */
-    hdma->DmaBaseAddress->IFCR = (DMA_ISR_TCIF1 << (hdma->ChannelIndex & 0x1cU));
-  }
-  /* Transfer Error Interrupt management **************************************/
-  else if ((0U != (flag_it & (DMA_FLAG_TE1 << (hdma->ChannelIndex & 0x1cU)))) && (0U != (source_it & DMA_IT_TE)))
-  {
-    /* When a DMA transfer error occurs */
-    /* A hardware clear of its EN bits is performed */
-    /* Disable ALL DMA IT */
-    __HAL_DMA_DISABLE_IT(hdma, (DMA_IT_TC | DMA_IT_HT | DMA_IT_TE));
-
-    /* Clear all flags */
-    hdma->DmaBaseAddress->IFCR = (DMA_ISR_GIF1 << (hdma->ChannelIndex & 0x1cU));
-
-    /* Update error code */
-    hdma->ErrorCode = HAL_DMA_ERROR_TE;
-  }
-}
-/* USER CODE END 1 */
