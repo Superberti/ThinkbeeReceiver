@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<EmBitz_layout_file>
+	<ActiveTarget name="Release" />
+	<File name="HAL\Inc\stm32l0xx_hal.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1652" topLine="18" />
+		</Cursor>
+	</File>
+	<File name="HAL\Inc\stm32l0xx_hal_cortex.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="596" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="HAL\Inc\stm32l0xx_hal_def.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1910" topLine="134" />
+		</Cursor>
+	</File>
+	<File name="HAL\Inc\stm32l0xx_hal_dma.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4640" topLine="89" />
+		</Cursor>
+	</File>
+	<File name="HAL\Inc\stm32l0xx_hal_gpio.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2631" topLine="55" />
+		</Cursor>
+	</File>
+	<File name="HAL\Inc\stm32l0xx_hal_spi.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="31503" topLine="660" />
+		</Cursor>
+	</File>
+	<File name="HAL\Inc\stm32l0xx_hal_tim.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="99832" topLine="1701" />
+		</Cursor>
+	</File>
+	<File name="HAL\Inc\stm32l0xx_hal_uart.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="78644" topLine="1472" />
+		</Cursor>
+	</File>
+	<File name="HAL\Src\stm32l0xx_hal.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5849" topLine="128" />
+		</Cursor>
+	</File>
+	<File name="HAL\Src\stm32l0xx_hal_dma.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="21675" topLine="621" />
+		</Cursor>
+	</File>
+	<File name="HAL\Src\stm32l0xx_hal_gpio.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="16882" topLine="389" />
+		</Cursor>
+	</File>
+	<File name="HAL\Src\stm32l0xx_hal_spi.c" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="101579" topLine="2985" />
+		</Cursor>
+	</File>
+	<File name="HAL\Src\stm32l0xx_hal_tim.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9905" topLine="165" />
+		</Cursor>
+	</File>
+	<File name="HAL\Src\stm32l0xx_hal_uart.c" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="14997" topLine="295" />
+		</Cursor>
+	</File>
+	<File name="inc\stm32l031xx.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9104" topLine="170" />
+		</Cursor>
+	</File>
+	<File name="inc\stm32l0xx.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7799" topLine="107" />
+		</Cursor>
+	</File>
+	<File name="inc\stm32l0xx_hal_conf.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="150" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="inc\stm32l0xx_it.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1681" topLine="11" />
+		</Cursor>
+	</File>
+	<File name="inc\TBReceiver.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3579" topLine="62" />
+		</Cursor>
+	</File>
+	<File name="src\startup_stm32l031xx.S" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4740" topLine="114" />
+		</Cursor>
+	</File>
+	<File name="src\stm32l0xx_hal_msp.c" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4874" topLine="143" />
+		</Cursor>
+	</File>
+	<File name="src\stm32l0xx_it.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5201" topLine="153" />
+		</Cursor>
+	</File>
+	<File name="src\system_stm32l0xx.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="105" />
+		</Cursor>
+	</File>
+	<File name="src\TBReceiver.c" open="1" top="1" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5652" topLine="156" />
+		</Cursor>
+	</File>
+</EmBitz_layout_file>

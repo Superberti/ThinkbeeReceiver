@@ -1,0 +1,480 @@
+# depslib dependency file v1.0
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\src\startup_stm32l031xx.s
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_adc.c
+	"stm32l0xx_hal.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal.h
+	"stm32l0xx_hal_conf.h"
+
+1695905973 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_conf.h
+	"stm32l0xx_hal_rcc.h"
+	"stm32l0xx_hal_exti.h"
+	"stm32l0xx_hal_gpio.h"
+	"stm32l0xx_hal_dma.h"
+	"stm32l0xx_hal_cortex.h"
+	"stm32l0xx_hal_adc.h"
+	"stm32l0xx_hal_comp.h"
+	"stm32l0xx_hal_crc.h"
+	"stm32l0xx_hal_cryp.h"
+	"stm32l0xx_hal_dac.h"
+	"stm32l0xx_hal_firewall.h"
+	"stm32l0xx_hal_flash.h"
+	"stm32l0xx_hal_i2c.h"
+	"stm32l0xx_hal_i2s.h"
+	"stm32l0xx_hal_iwdg.h"
+	"stm32l0xx_hal_lcd.h"
+	"stm32l0xx_hal_lptim.h"
+	"stm32l0xx_hal_pwr.h"
+	"stm32l0xx_hal_rng.h"
+	"stm32l0xx_hal_rtc.h"
+	"stm32l0xx_hal_spi.h"
+	"stm32l0xx_hal_tim.h"
+	"stm32l0xx_hal_tsc.h"
+	"stm32l0xx_hal_uart.h"
+	"stm32l0xx_hal_usart.h"
+	"stm32l0xx_hal_irda.h"
+	"stm32l0xx_hal_smartcard.h"
+	"stm32l0xx_hal_smbus.h"
+	"stm32l0xx_hal_wwdg.h"
+	"stm32l0xx_hal_pcd.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_rcc.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_rcc_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_def.h
+	"stm32l0xx.h"
+	"Legacy/stm32_hal_legacy.h"
+	<stddef.h>
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\inc\stm32l0xx.h
+	"stm32l010xb.h"
+	"stm32l010x8.h"
+	"stm32l010x6.h"
+	"stm32l010x4.h"
+	"stm32l011xx.h"
+	"stm32l021xx.h"
+	"stm32l031xx.h"
+	"stm32l041xx.h"
+	"stm32l051xx.h"
+	"stm32l052xx.h"
+	"stm32l053xx.h"
+	"stm32l062xx.h"
+	"stm32l063xx.h"
+	"stm32l071xx.h"
+	"stm32l072xx.h"
+	"stm32l073xx.h"
+	"stm32l082xx.h"
+	"stm32l083xx.h"
+	"stm32l081xx.h"
+	"stm32l0xx_hal.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\inc\stm32l031xx.h
+	"core_cm0plus.h"
+	"system_stm32l0xx.h"
+	<stdint.h>
+
+1695724693 d:\mcu-projekte\thinkbeereceiver\cmsis\core_cm0plus.h
+	<stdint.h>
+	"cmsis_version.h"
+	"cmsis_compiler.h"
+	"mpu_armv7.h"
+
+1695724693 d:\mcu-projekte\thinkbeereceiver\cmsis\cmsis_version.h
+
+1695724693 d:\mcu-projekte\thinkbeereceiver\cmsis\cmsis_compiler.h
+	<stdint.h>
+	"cmsis_armcc.h"
+	"cmsis_armclang_ltm.h"
+	"cmsis_armclang.h"
+	"cmsis_gcc.h"
+	<cmsis_iccarm.h>
+	<cmsis_ccs.h>
+	<cmsis_csm.h>
+
+1695724693 d:\mcu-projekte\thinkbeereceiver\cmsis\cmsis_gcc.h
+
+1695724693 d:\mcu-projekte\thinkbeereceiver\cmsis\mpu_armv7.h
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\inc\system_stm32l0xx.h
+
+1695724693 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32_hal_legacy.h
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_rcc_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_gpio.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_gpio_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_gpio_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_dma.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_cortex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_adc.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_adc_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_adc_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_comp.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_comp_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_comp_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_crc.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_crc_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_crc_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_cryp.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_cryp_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_cryp_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_dac.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_dac_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_dac_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_firewall.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_flash.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_flash_ex.h"
+	"stm32l0xx_hal_flash_ramfunc.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_flash_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_flash_ramfunc.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_i2c.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_i2c_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_i2c_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_i2s.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_iwdg.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_lcd.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_lptim.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_pwr.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_pwr_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_pwr_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_rng.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_rtc.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_rtc_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_rtc_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_spi.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_tim.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_tim_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_tim_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_tsc.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_uart.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_uart_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_uart_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_usart.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_usart_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_usart_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_irda.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_irda_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_irda_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_smartcard.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_smartcard_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_smartcard_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_smbus.h
+	"stm32l0xx_hal_def.h"
+	"stm32l0xx_hal_smbus_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_wwdg.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_pcd.h
+	"stm32l0xx_ll_usb.h"
+	"stm32l0xx_hal_pcd_ex.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_pcd_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_adc_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_comp.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_comp_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_cortex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_crc.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_crc_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_cryp.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_cryp_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_dac.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_dac_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_dma.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_firewall.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_flash.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_flash_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_flash_ramfunc.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_gpio.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_i2c.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_i2c_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_i2s.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_irda.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_iwdg.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_lcd.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_lptim.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_pcd.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_pcd_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_pwr.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_pwr_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_rcc.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_rcc_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_rng.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_rtc.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_rtc_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_smartcard.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_smartcard_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_smbus.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_spi.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_tim.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_tim_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_tsc.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_uart.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_uart_ex.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_usart.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_wwdg.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal.c
+	"stm32l0xx_hal.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\src\system_stm32l0xx.c
+	"stm32l0xx.h"
+
+1696523188 source:d:\mcu-projekte\thinkbeereceiver\src\tbreceiver.c
+	"TBReceiver.h"
+	"stm32l0xx_ll_dma.h"
+	<string.h>
+	<stdio.h>
+	<stdarg.h>
+	<stdatomic.h>
+
+1695805109 d:\mcu-projekte\thinkbeereceiver\inc\main.h
+	"stm32l0xx_hal.h"
+
+1696503424 d:\mcu-projekte\thinkbeereceiver\inc\tbreceiver.h
+	"stm32l0xx_hal.h"
+	"stm32l0xx_hal_spi.h"
+	"stm32l0xx_hal_tim.h"
+	"stm32l0xx_it.h"
+	<stdio.h>
+
+1695805109 d:\mcu-projekte\thinkbeereceiver\inc\stm32l0xx_it.h
+
+1696510156 source:d:\mcu-projekte\thinkbeereceiver\src\stm32l0xx_it.c
+	"TBReceiver.h"
+	"stm32l0xx_it.h"
+
+1695911702 d:\mcu-projekte\thinkbeereceiver\inc\stm32l0xx_hal_conf.h
+	"stm32l0xx_hal_rcc.h"
+	"stm32l0xx_hal_exti.h"
+	"stm32l0xx_hal_gpio.h"
+	"stm32l0xx_hal_dma.h"
+	"stm32l0xx_hal_cortex.h"
+	"stm32l0xx_hal_adc.h"
+	"stm32l0xx_hal_comp.h"
+	"stm32l0xx_hal_crc.h"
+	"stm32l0xx_hal_cryp.h"
+	"stm32l0xx_hal_dac.h"
+	"stm32l0xx_hal_firewall.h"
+	"stm32l0xx_hal_flash.h"
+	"stm32l0xx_hal_i2c.h"
+	"stm32l0xx_hal_i2s.h"
+	"stm32l0xx_hal_iwdg.h"
+	"stm32l0xx_hal_lcd.h"
+	"stm32l0xx_hal_lptim.h"
+	"stm32l0xx_hal_pwr.h"
+	"stm32l0xx_hal_rng.h"
+	"stm32l0xx_hal_rtc.h"
+	"stm32l0xx_hal_spi.h"
+	"stm32l0xx_hal_tim.h"
+	"stm32l0xx_hal_tsc.h"
+	"stm32l0xx_hal_uart.h"
+	"stm32l0xx_hal_usart.h"
+	"stm32l0xx_hal_irda.h"
+	"stm32l0xx_hal_smartcard.h"
+	"stm32l0xx_hal_smbus.h"
+	"stm32l0xx_hal_wwdg.h"
+	"stm32l0xx_hal_pcd.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\legacy\stm32_hal_legacy.h
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_exti.h
+	"stm32l0xx.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_hal_smbus_ex.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_ll_usb.h
+	"stm32l0xx_hal_def.h"
+
+1695803187 source:d:\mcu-projekte\thinkbeereceiver\hal\src\stm32l0xx_hal_exti.c
+	"stm32l0xx_hal.h"
+
+1695992759 source:d:\mcu-projekte\thinkbeereceiver\src\stm32l0xx_hal_msp.c
+	"TBReceiver.h"
+
+1695803187 d:\mcu-projekte\thinkbeereceiver\hal\inc\stm32l0xx_ll_dma.h
+	"stm32l0xx.h"
+
+1675186130 source:d:\mcu-projekte\thinkbeereceiver\src\syscalls.c
+	<sys/stat.h>
+	<stdlib.h>
+	<errno.h>
+	<stdio.h>
+	<signal.h>
+	<time.h>
+	<sys/time.h>
+	<sys/times.h>
+
