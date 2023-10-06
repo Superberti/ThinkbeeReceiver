@@ -25,7 +25,6 @@ volatile uint8_t SampleCount=0;
 volatile uint32_t MillisCounter=0;
 /* Private variables ---------------------------------------------------------*/
 
-static GPIO_InitTypeDef  RFInput_InitStruct;
 TIM_HandleTypeDef htim2;
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_rx;
@@ -37,6 +36,7 @@ UART_HandleTypeDef huart2;
 #define SPI_BUF_SIZE 32
 static uint32_t SPIRecBuf[SPI_BUF_SIZE]= {};
 static uint32_t SPITransBuf[SPI_BUF_SIZE]= {};
+static uint8_t HammingBuf[SPI_BUF_SIZE]={};
 static char PrintBuf[80]= {};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -66,12 +66,6 @@ int HammingWeight( uint8_t b );
     _a < _b ? _a : _b;       \
 })
 
-#define BitCount(X,Y)           \
-                Y = X - ((X >> 1) & 033333333333) - ((X >> 2) & 011111111111); \
-                Y = ((Y + (Y >> 3)) & 030707070707); \
-                Y =  (Y + (Y >> 6)); \
-                Y = (Y + (Y >> 12) + (Y >> 24)) & 077;
-
 
 volatile double smMeanBufPos=0.0;
 volatile int smMinBufPos=256;
@@ -85,7 +79,7 @@ volatile uint64_t smDMACounter=0;
   */
 int main(void)
 {
-
+  //int z=__builtin_popcount(0x55);
   /* STM32L0xx HAL library initialization:
        - Configure the Flash prefetch, Flash preread and Buffer caches
        - Systick timer is configured by default as source of time base, but user
@@ -102,17 +96,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_SPI1_Init();
+  //MX_DMA_Init();
+  //MX_SPI1_Init();
   MX_USART2_UART_Init();
 
-  /*
-  RFInput_InitStruct.Mode= GPIO_MODE_INPUT;
-  RFInput_InitStruct.Pull= GPIO_NOPULL;
-  RFInput_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  RFInput_InitStruct.Pin = GPIO_PIN_4;
-  HAL_GPIO_Init(GPIOB, &RFInput_InitStruct);
-  */
+
 
   /* -3- Toggle IO in an infinite loop */
   for (int i=0; i<20; i++)
@@ -125,38 +113,39 @@ int main(void)
 
   HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
 
-  //HAL_UART_Transmit(&huart2, (uint8_t *)"Hello\r\n", 7, 0xFFFF);
-
   SerialOut("\r\nThinkBee Receiver started!\r\n");
 
   MX_TIM2_Init();
 
+  /*
   memset(SPITransBuf,0x55,sizeof(SPITransBuf));
   memset(SPIRecBuf,0,sizeof(SPIRecBuf));
 
   if (HAL_SPI_TransmitReceive_DMA(&hspi1, (uint8_t*)SPITransBuf, (uint8_t*)SPIRecBuf, sizeof(SPIRecBuf)) != HAL_OK)
   {
-    /* Starting Error */
+    // Starting Error
     Error_Handler();
-  }
+  }*/
 
-  /*
+
     while(1)
     {
       HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
       // Insert delay 100 ms
       HAL_Delay(100);
     }
-  */
+  /*
   double iMeanHammingWeight=SPI_BUF_SIZE/2;
   int iMinBufPos;
   int iMaxBufPos;
-  uint64_t iDMACounter;
+  uint32_t iBitCounter=0;
+  uint32_t iLastBitCounter=0;
   uint64_t iLastDMACounter=0;
-  uint32_t TestBuf[SPI_BUF_SIZE];
+  uint64_t iDMACounter=0;
+  uint32_t iHammingCounter=0;
+
   while(1)
   {
-
     HAL_NVIC_DisableIRQ(DMA1_Channel2_3_IRQn);
     //iMeanBufPos=smMeanBufPos;
     //iMinBufPos=smMinBufPos;
@@ -165,82 +154,57 @@ int main(void)
     HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
     if (iDMACounter-iLastDMACounter>=10000)
     {
-      iLastDMACounter=iDMACounter;
       //HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
-      snprintf(PrintBuf, sizeof(PrintBuf), "Mean hamming weight: %d\r\n",(int)iMeanHammingWeight);
+      snprintf(PrintBuf, sizeof(PrintBuf), "Mean hamming weight: %d\r\n",iBitCounter/iHammingCounter);
       SerialOut(PrintBuf);
+      iBitCounter=0;
+      iHammingCounter=0;
+      iLastDMACounter=iDMACounter;
     }
     if (FirstHalfReady)
     {
-      HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, SPIRecBuf[0]);
+      //HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, SPIRecBuf[0]);
       for (int i=0;i<SPI_BUF_SIZE/2;i++)
       {
-        TestBuf[i]=SPIRecBuf[i];
-        iMeanHammingWeight=0.99*iMeanHammingWeight+0.01*TestBuf[i];
-        if (TestBuf[i]>32)
-          SerialOut("Komischer Puffer 1/2...\r\n");
+        iHammingCounter++;
+        iBitCounter+=HammingBuf[i];
+        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, HammingBuf[i]>31);
+        //HammingBuf[i]=SPIRecBuf[i];
+        //iMeanHammingWeight=0.99*iMeanHammingWeight+0.01*HammingBuf[i];
+        //if (HammingBuf[i]>32)
+          //SerialOut("Komischer Puffer 1/2...\r\n");
       }
       FirstHalfReady=0;
     }
     else if (SecondHalfReady)
     {
-      HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, SPIRecBuf[SPI_BUF_SIZE/2]);
+      //HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, SPIRecBuf[SPI_BUF_SIZE/2]);
       for (int i=SPI_BUF_SIZE/2;i<SPI_BUF_SIZE;i++)
       {
-        TestBuf[i]=SPIRecBuf[i];
-        iMeanHammingWeight=0.99*iMeanHammingWeight+0.01*TestBuf[i];
-        if (TestBuf[i]>32)
-          SerialOut("Komischer Puffer 2/2...\r\n");
+        iHammingCounter++;
+        iBitCounter+=HammingBuf[i];
+        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, HammingBuf[i]>31);
+        //HammingBuf[i]=SPIRecBuf[i];
+        //iMeanHammingWeight=0.99*iMeanHammingWeight+0.01*HammingBuf[i];
+        //if (HammingBuf[i]>32)
+          //SerialOut("Komischer Puffer 2/2...\r\n");
       }
       SecondHalfReady=0;
     }
-  }
+  }*/
 
   uint64_t Mikroseconds, LastTime, TimeDiff;
   uint64_t DiffTimes[10];
   uint32_t DiffCounter=0;
   uint8_t Pin;
   LastTime=MillisCounter*1000 + TIM2->CNT;
-  uint32_t SampleCounter=0;
-  uint32_t SampleValue=0;
-  uint32_t SampleCounters[10];
-  uint32_t SampleValues[10];
-  int test;
-  for (int i=0; i<1000000; i++)
+
+  while(1)
   {
     Mikroseconds = MillisCounter*1000 + TIM2->CNT;
     Pin=(GPIOB->IDR & GPIO_PIN_4)>0;
     //GPIO_PinState rfi = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4);
-    /*
-    if (Pin)
-      GPIOB->BSRR = LED3_PIN;
-    else
-      GPIOB->BRR = LED3_PIN;
-    */
-    //HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, Pin);
-    SampleValue+=Pin;
-    SampleCounter++;
-
-    // Alle 10 µs den Mittelwert der bis dahin angefallenen Samples bilden
-    if (Mikroseconds-LastTime >= 1000)
-    {
-      TimeDiff=Mikroseconds-LastTime;
-      DiffTimes[DiffCounter % 10]=TimeDiff;
-      SampleCounters[DiffCounter % 10]=SampleCounter;
-      SampleValues[DiffCounter % 10]=SampleValue;
-      SampleCounter=0;
-      SampleValue=0;
-      DiffCounter++;
-      LastTime=MillisCounter*1000 + TIM2->CNT;
-    }
-    //HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
-  }
-
-
-  while(1)
-  {
-    GPIO_PinState rfi = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4);
-    HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, rfi);
+    HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, Pin);
   }
 }
 
@@ -256,14 +220,15 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
   if (SecondHalfReady)
   {
+    SerialOut("f");
     return;
   }
   uint32_t pos = sizeof(SPIRecBuf) - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
 
   for (int i=SPI_BUF_SIZE/2;i<SPI_BUF_SIZE;i++)
   {
-    BitCount(SPIRecBuf[i],BitCounter);
-    SPIRecBuf[i] = BitCounter;// BitCounter>26;
+    HammingBuf[i]=__builtin_popcount(SPIRecBuf[i]);
+    //HammingBuf[i] = BitCounter;// BitCounter>26;
   }
 
 
@@ -274,14 +239,15 @@ void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi)
 {
   if (FirstHalfReady)
   {
+    SerialOut("h");
     return;
   }
   uint32_t pos = sizeof(SPIRecBuf) - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
 
   for (int i=0;i<SPI_BUF_SIZE/2;i++)
   {
-    BitCount(SPIRecBuf[i],BitCounter);
-    SPIRecBuf[i] = BitCounter;//BitCounter>26;
+    HammingBuf[i]=__builtin_popcount(SPIRecBuf[i]);
+    //HammingBuf[i] = BitCounter;//BitCounter>26;
   }
   FirstHalfReady=1;
   smDMACounter++;
@@ -528,6 +494,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
+
+  GPIO_InitTypeDef RFInput_InitStruct= {0};
+  RFInput_InitStruct.Mode= GPIO_MODE_INPUT;
+  RFInput_InitStruct.Pull= GPIO_NOPULL;
+  RFInput_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  RFInput_InitStruct.Pin = GPIO_PIN_4;
+  HAL_GPIO_Init(GPIOB, &RFInput_InitStruct);
+
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
   /* USER CODE END MX_GPIO_Init_2 */

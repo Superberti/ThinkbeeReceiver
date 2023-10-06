@@ -89,18 +89,18 @@ void Error_Handler(void);
 enum ReaderState
 {
   RS_INIT,          // Status nach Init/Neustart
-  RS_START,         // Status erster High-Level
-  RS_TOO_SHORT,     // Bitlaufzeit zu lang
-  RS_TOO_LONG,      // Bitlaufzeit zu kurz
+  RS_HIGH_LONG,     // Starterkennung: Erstes langes High-Bit (220 µs) erkannt
+  RS_LOW_PAUSE,     // Starterkennung: Lange Pause (600 µs) erkannt
+  RS_DATA,          // Datenphase
 };
 
 // Bitlaufzeiten in Mikrosekunden
 enum BitTimes
 {
-  HIGH_SHORT = 100,
-  HIGH_LONG = 200,
-  LOW_SHORT = 100,
-  LOW_LONG = 300,
+  HIGH_SHORT = 114,
+  HIGH_LONG = 220,
+  LOW_SHORT = 90,
+  LOW_LONG = 287,
   LOW_PAUSE = 600,
 };
 

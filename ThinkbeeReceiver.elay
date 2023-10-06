@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <EmBitz_layout_file>
-	<ActiveTarget name="Release" />
+	<ActiveTarget name="Debug" />
 	<File name="HAL\Inc\stm32l0xx_hal.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1652" topLine="18" />
@@ -41,22 +41,22 @@
 			<Cursor1 position="78644" topLine="1472" />
 		</Cursor>
 	</File>
-	<File name="HAL\Src\stm32l0xx_hal.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="HAL\Src\stm32l0xx_hal.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5849" topLine="128" />
+			<Cursor1 position="5849" topLine="100" />
 		</Cursor>
 	</File>
-	<File name="HAL\Src\stm32l0xx_hal_dma.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="HAL\Src\stm32l0xx_hal_dma.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="21675" topLine="621" />
 		</Cursor>
 	</File>
-	<File name="HAL\Src\stm32l0xx_hal_gpio.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="HAL\Src\stm32l0xx_hal_gpio.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="16882" topLine="389" />
 		</Cursor>
 	</File>
-	<File name="HAL\Src\stm32l0xx_hal_spi.c" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="HAL\Src\stm32l0xx_hal_spi.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="101579" topLine="2985" />
 		</Cursor>
@@ -76,7 +76,7 @@
 			<Cursor1 position="9104" topLine="170" />
 		</Cursor>
 	</File>
-	<File name="inc\stm32l0xx.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="inc\stm32l0xx.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="7799" topLine="107" />
 		</Cursor>
@@ -86,27 +86,27 @@
 			<Cursor1 position="150" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="inc\stm32l0xx_it.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="inc\stm32l0xx_it.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1681" topLine="11" />
 		</Cursor>
 	</File>
-	<File name="inc\TBReceiver.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="inc\TBReceiver.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="3579" topLine="62" />
 		</Cursor>
 	</File>
-	<File name="src\startup_stm32l031xx.S" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\startup_stm32l031xx.S" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="4740" topLine="114" />
 		</Cursor>
 	</File>
-	<File name="src\stm32l0xx_hal_msp.c" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\stm32l0xx_hal_msp.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="4874" topLine="143" />
 		</Cursor>
 	</File>
-	<File name="src\stm32l0xx_it.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+	<File name="src\stm32l0xx_it.c" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="5201" topLine="153" />
 		</Cursor>
@@ -116,9 +116,9 @@
 			<Cursor1 position="0" topLine="105" />
 		</Cursor>
 	</File>
-	<File name="src\TBReceiver.c" open="1" top="1" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\TBReceiver.c" open="1" top="1" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5652" topLine="156" />
+			<Cursor1 position="6322" topLine="164" />
 		</Cursor>
 	</File>
 </EmBitz_layout_file>
