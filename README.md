@@ -17,6 +17,10 @@ Heraus kommt am Ende ein Datenwort (34 Bits), mit dem man zumindest schon einmal
 Welche Bits zu einer ID oder zu einer Funktion gehören, kann ich mit meinen vorhandenen zwei Schaltern natürlich nicht
 feststellen, hier wäre ich für weiteren Input (=aufgezeichnete Signale) dankbar!
 
+Die Datenerfassung ist zwar momentan recht STM32-spezifisch, die DecodeStart- und DecodeMsg-Funktionen benötigen allerdings nur
+den aktuellen Eingangslevel (nach Flankenwechsel), die Zeit bis zum vorherigen Flankenwechsel und einen Schrittzähler. Damit sollte man
+auch mit anderen Mikrocontrollern kein Problem haben.
+
 Viel Spaß beim Ausprobieren!
 
  
