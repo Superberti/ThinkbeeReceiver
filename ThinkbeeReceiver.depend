@@ -392,18 +392,15 @@
 1695803187 source:d:\mcu-projekte\thinkbeereceiver\src\system_stm32l0xx.c
 	"stm32l0xx.h"
 
-1696865347 source:d:\mcu-projekte\thinkbeereceiver\src\tbreceiver.c
+1696867257 source:d:\mcu-projekte\thinkbeereceiver\src\tbreceiver.c
 	"TBReceiver.h"
-	"stm32l0xx_ll_dma.h"
 	<string.h>
 	<stdio.h>
-	<stdarg.h>
-	<stdatomic.h>
 
 1695805109 d:\mcu-projekte\thinkbeereceiver\inc\main.h
 	"stm32l0xx_hal.h"
 
-1696847438 d:\mcu-projekte\thinkbeereceiver\inc\tbreceiver.h
+1696867726 d:\mcu-projekte\thinkbeereceiver\inc\tbreceiver.h
 	"stm32l0xx_hal.h"
 	"stm32l0xx_hal_spi.h"
 	"stm32l0xx_hal_tim.h"
@@ -412,7 +409,7 @@
 
 1695805109 d:\mcu-projekte\thinkbeereceiver\inc\stm32l0xx_it.h
 
-1696859731 source:d:\mcu-projekte\thinkbeereceiver\src\stm32l0xx_it.c
+1696867575 source:d:\mcu-projekte\thinkbeereceiver\src\stm32l0xx_it.c
 	"TBReceiver.h"
 	"stm32l0xx_it.h"
 

@@ -4,70 +4,25 @@
   * @author  Oliver Rutsch
   * @brief   ThinkBee RF Switch Receiver.
   ******************************************************************************
-  * @attention
-  *
-  *
-  *
-  ******************************************************************************
   */
 
 /* Includes ------------------------------------------------------------------*/
 #include "TBReceiver.h"
-#include "stm32l0xx_ll_dma.h"
 #include <string.h>
 #include <stdio.h>
-#include <stdarg.h>
-#include <stdatomic.h>
 
 /* Global variables ---------------------------------------------------------*/
-volatile uint8_t SampleBuf[10];
-volatile uint8_t SampleCount=0;
-volatile uint32_t MillisCounter=0;
-volatile uint32_t TimeDiffs[100]= {};
+// TimeDiffs nur für's Debuggen interessant!
+//volatile uint32_t TimeDiffs[100]= {};
 volatile uint32_t TimeDiffCounter=0;
-/* Private variables ---------------------------------------------------------*/
-
 TIM_HandleTypeDef htim2;
 /* Timer Input Capture Configuration Structure declaration */
 TIM_IC_InitTypeDef     sICConfig1;
 TIM_IC_InitTypeDef     sICConfig2;
-
 UART_HandleTypeDef huart2;
 
 volatile uint8_t MsgReady=0;
-#define SPI_BUF_SIZE 32
 static char PrintBuf[80]= {};
-/* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_USART2_UART_Init(void);
-static void MX_TIM2_Init(void);
-
-void SerialOut(const char *aText);
-int HammingWeight( uint8_t b );
-
-
-/* Private functions ---------------------------------------------------------*/
-
-#define max(a,b)             \
-({                           \
-    __typeof__ (a) _a = (a); \
-    __typeof__ (b) _b = (b); \
-    _a > _b ? _a : _b;       \
-})
-
-#define min(a,b)             \
-({                           \
-    __typeof__ (a) _a = (a); \
-    __typeof__ (b) _b = (b); \
-    _a < _b ? _a : _b;       \
-})
-
-
-volatile double smMeanBufPos=0.0;
-volatile int smMinBufPos=256;
-volatile int smMaxBufPos=0;
-volatile uint64_t smDMACounter=0;
 
 // Diese Sequenz wird immer gesendet, danach kann man suchen
 const enum BitTimes StartSequence[14]= {HIGH_LONG, LOW_PAUSE, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG};
@@ -82,11 +37,15 @@ const uint32_t NumMsgBits=34;
 int erg;
 uint64_t Msg;
 
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
+static void MX_TIM2_Init(void);
+void SerialOut(const char *aText);
 
 int main(void)
 {
-  //int z=__builtin_popcount(0x55);
-
   HAL_Init();
 
   /* Configure the system clock to 32 MHz */
@@ -96,8 +55,6 @@ int main(void)
   MX_GPIO_Init();
 
   MX_USART2_UART_Init();
-
-
 
   /* -3- Toggle IO in an infinite loop */
   for (int i=0; i<20; i++)
@@ -112,20 +69,13 @@ int main(void)
 
   SerialOut("\r\nThinkBee Receiver started!\r\n");
 
-  MX_TIM2_Init();
-
-  uint32_t Mikroseconds, UpdateTime, LastTime, TimeDiff, PacketCounter=0;
-
-  uint8_t Pin, LastPin;
-
-  LastTime=GetMicros();//MillisCounter*1000 + TIM2->CNT;
-  UpdateTime=LastTime;
-  LastPin=0;
   GetBitTimes(HIGH_SHORT, &HighShort);
   GetBitTimes(HIGH_LONG, &HighLong);
   GetBitTimes(LOW_SHORT, &LowShort);
   GetBitTimes(LOW_LONG, &LowLong);
   GetBitTimes(LOW_PAUSE, &LowPause);
+
+  MX_TIM2_Init();
 
   while(1)
   {
@@ -137,9 +87,6 @@ int main(void)
       MsgReady=0;
     }
   }
-
-
-  //GPIO_PinState rfi = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4);
 }
 
 int DecodeStart(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t SeqCount)
@@ -201,25 +148,12 @@ void GetBitTimes(enum BitTimes bt, struct MinMaxBitTimes* aMinMax)
   aMinMax->Max=((int)bt*(100+Diff))/100;
 }
 
-int HammingWeight( uint8_t b )
-{
-  b = b - ((b >> 1) & 0x55);
-  b = (b & 0x33) + ((b >> 2) & 0x33);
-  return (((b + (b >> 4)) & 0x0F) * 0x01);
-}
-
-
-/**
-  * @brief  Conversion complete callback in non blocking mode
-  * @param  htim : hadc handle
-  * @retval None
-  */
-
+// IRQ-Callback für beide Flanken
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
   if (MsgReady==1)
   {
-    // Keine weitere Aktion mehr, solange das Hauptprogramm die letzte Msg nicht verarbeitet hat!
+    // Keine weitere Aktion mehr, solange das Hauptprogramm die letzte Msg noch nicht verarbeitet hat!
     return;
   }
   if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
@@ -251,7 +185,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
   PreviousTime=CurrentTime;
   HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
 
-  TimeDiffs[SeqCount % 100]=DiffTime; // Capturezeit in Mikrosekunden
+  //TimeDiffs[SeqCount % 100]=DiffTime; // Capturezeit in Mikrosekunden
 
   if (SeqCount<COUNTOF(StartSequence))
   {
@@ -304,18 +238,12 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 static void MX_TIM2_Init(void)
 {
 
-  /* USER CODE BEGIN TIM2_Init 0 */
-
-  /* USER CODE END TIM2_Init 0 */
-
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
 
-  /* USER CODE BEGIN TIM2_Init 1 */
   /* Compute the prescaler value to have TIMx counter clock equal to 1 MHz */
   uint32_t uwPrescalerValue = (uint32_t)(SystemCoreClock / 1000000) - 1;
 
-  /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = uwPrescalerValue;  // Timer zählt mit 1 MHz hoch
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -327,8 +255,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
 
-  /* Configure the Input Capture channel ################################*/
-  /* Configure the Input Capture of channel 1 */
+  // Kanal1 triggert auf die fallende Flanke
   sICConfig1.ICPolarity  = TIM_ICPOLARITY_FALLING;
   sICConfig1.ICSelection = TIM_ICSELECTION_INDIRECTTI;
   sICConfig1.ICPrescaler = TIM_ICPSC_DIV1;
@@ -338,8 +265,8 @@ static void MX_TIM2_Init(void)
     /* Configuration Error */
     Error_Handler();
   }
-  /*##-2- Configure the Input Capture channel ################################*/
-  /* Configure the Input Capture of channel 2 */
+
+  // Kanal1 triggert auf die steigende Flanke
   sICConfig2.ICPolarity  = TIM_ICPOLARITY_RISING;
   sICConfig2.ICSelection = TIM_ICSELECTION_DIRECTTI;
   sICConfig2.ICPrescaler = TIM_ICPSC_DIV1;
@@ -350,7 +277,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
 
-  /*##-3- Start the Input Capture in interrupt mode ##########################*/
+  // Flankeninterrupts starten
   if(HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK)
   {
     /* Starting Error */
@@ -431,14 +358,6 @@ void SystemClock_Config(void)
   */
 static void MX_USART2_UART_Init(void)
 {
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
   huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
@@ -453,10 +372,6 @@ static void MX_USART2_UART_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
-
 }
 
 /**
@@ -467,8 +382,6 @@ static void MX_USART2_UART_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  /* USER CODE BEGIN MX_GPIO_Init_1 */
-  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -492,9 +405,6 @@ static void MX_GPIO_Init(void)
   RFInput_InitStruct.Pin = GPIO_PIN_4;
   HAL_GPIO_Init(GPIOB, &RFInput_InitStruct);
 
-
-  /* USER CODE BEGIN MX_GPIO_Init_2 */
-  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /**
@@ -522,7 +432,7 @@ void Error_Handler(void)
   */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-  snprintf(PrintBuf,sizeof(PrintBuffer),"Wrong parameters value: file %s on line %d\r\n", file, line);
+  snprintf(PrintBuf,sizeof(PrintBuf),"Wrong parameters value: file %s on line %d\r\n", file, line);
   SerialOut(PrintBuf);
   /* Infinite loop */
   while (1)

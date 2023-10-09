@@ -46,7 +46,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-void Clear_DMA_IRQ(DMA_HandleTypeDef *hdma);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -56,7 +56,6 @@ void Clear_DMA_IRQ(DMA_HandleTypeDef *hdma);
 
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim2;
-uint32_t MillisCounter;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -125,13 +124,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-  /* USER CODE BEGIN SysTick_IRQn 0 */
-
-  /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
-  /* USER CODE BEGIN SysTick_IRQn 1 */
-
-  /* USER CODE END SysTick_IRQn 1 */
 }
 
 /******************************************************************************/
@@ -149,5 +142,4 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
 }
 
-/* USER CODE BEGIN 1 */
 
