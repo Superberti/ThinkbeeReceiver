@@ -23,11 +23,18 @@
 volatile uint8_t SampleBuf[10];
 volatile uint8_t SampleCount=0;
 volatile uint32_t MillisCounter=0;
+volatile uint32_t TimeDiffs[100]= {};
+volatile uint32_t TimeDiffCounter=0;
 /* Private variables ---------------------------------------------------------*/
 
 TIM_HandleTypeDef htim2;
+/* Timer Input Capture Configuration Structure declaration */
+TIM_IC_InitTypeDef     sICConfig1;
+TIM_IC_InitTypeDef     sICConfig2;
 
 UART_HandleTypeDef huart2;
+
+volatile uint8_t MsgReady=0;
 #define SPI_BUF_SIZE 32
 static char PrintBuf[80]= {};
 /* Private function prototypes -----------------------------------------------*/
@@ -66,23 +73,20 @@ volatile uint64_t smDMACounter=0;
 const enum BitTimes StartSequence[14]= {HIGH_LONG, LOW_PAUSE, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG};
 static struct MinMaxBitTimes HighShort, HighLong, LowShort, LowLong, LowPause;
 
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
+uint8_t PinState=0, BitState;
+uint32_t CurrentTime=0, PreviousTime=0;
+uint32_t DiffTime=0;
+uint32_t SeqCount=0;
+uint32_t BitSeqCounter=0, BitCounter=0;
+const uint32_t NumMsgBits=34;
+int erg;
+uint64_t Msg;
+
+
 int main(void)
 {
   //int z=__builtin_popcount(0x55);
-  /* STM32L0xx HAL library initialization:
-       - Configure the Flash prefetch, Flash preread and Buffer caches
-       - Systick timer is configured by default as source of time base, but user
-             can eventually implement his proper time base source (a general purpose
-             timer for example or other time source), keeping in mind that Time base
-             duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and
-             handled in milliseconds basis.
-       - Low Level Initialization
-     */
+
   HAL_Init();
 
   /* Configure the system clock to 32 MHz */
@@ -90,8 +94,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  //MX_DMA_Init();
-  //MX_SPI1_Init();
+
   MX_USART2_UART_Init();
 
 
@@ -112,106 +115,29 @@ int main(void)
   MX_TIM2_Init();
 
   uint32_t Mikroseconds, UpdateTime, LastTime, TimeDiff, PacketCounter=0;
-  uint32_t TimeDiffs[100]={};
+
   uint8_t Pin, LastPin;
 
   LastTime=GetMicros();//MillisCounter*1000 + TIM2->CNT;
   UpdateTime=LastTime;
   LastPin=0;
-
-
   GetBitTimes(HIGH_SHORT, &HighShort);
   GetBitTimes(HIGH_LONG, &HighLong);
   GetBitTimes(LOW_SHORT, &LowShort);
   GetBitTimes(LOW_LONG, &LowLong);
   GetBitTimes(LOW_PAUSE, &LowPause);
 
-  uint32_t SeqCount=0;
-  uint32_t BitSeqCounter=0;
-  uint32_t BitCounter=0;
-  uint64_t Msg=0;
-  int erg;
-  const uint32_t NumMsgBits=34;
-  uint8_t BitState;
-  uint32_t LoopCounter=0;
   while(1)
   {
-    Mikroseconds = GetMicros();//MillisCounter*1000 + TIM2->CNT;
-    Pin=(GPIOB->IDR & GPIO_PIN_4)>0;
-    // Pin getogglet?
-    if (Pin!=LastPin)
+    if (MsgReady)
     {
-      PacketCounter++;
-      TimeDiff=Mikroseconds-LastTime;
-      TimeDiffs[SeqCount % 100]=TimeDiff;
-      LastTime=Mikroseconds;
-      if (SeqCount<COUNTOF(StartSequence))
-      {
-        erg=DecodeStart(Pin, TimeDiff, SeqCount);
-        //if (erg==1)
-          //SerialOut("Thinkbee Start detektiert!\r\n");
-      }
-      else
-      {
-        // Jetzt folgen noch 34 Datenbits (evtl. gehören  auch noch welche zur Startsequenz oder umgekehrt)
-        erg=DecodeMsg(Pin, TimeDiff, BitSeqCounter, &BitState);
-        if (erg==1)
-        {
-          Msg|=(BitState << BitCounter);
-          BitCounter++;
-        }
-        BitSeqCounter++;
-      }
-
-      SeqCount++;
-
-      if (BitCounter==NumMsgBits)
-      {
-        snprintf(PrintBuf,sizeof(PrintBuf),"Thinkbee Paket detektiert: %llu\r\n", Msg);
-        SerialOut(PrintBuf);
-        BitSeqCounter=0;
-        BitCounter=0;
-        Msg=0;
-        SeqCount=0;
-        continue;
-      }
-
-      if (erg==-1)
-      {
-        if (SeqCount>10)
-        {
-          snprintf(PrintBuf,sizeof(PrintBuf),"Sequenz abgebrochen nach %u Bitzeiten, BC: %d: \r\n", SeqCount, BitCounter);
-          SerialOut(PrintBuf);
-          for (int i=0;i<SeqCount && i<100;i++)
-          {
-            snprintf(PrintBuf,sizeof(PrintBuf),"%u ", TimeDiffs[i]);
-            SerialOut(PrintBuf);
-          }
-          SerialOut("\r\n");
-        }
-        // Dekodierungsfehler aufgetreten
-        BitSeqCounter=0;
-        BitCounter=0;
-        Msg=0;
-        SeqCount=0;
-        continue;
-      }
-
-
-    }
-
-
-    if (Mikroseconds-UpdateTime>=1000000)
-    {
-      UpdateTime=Mikroseconds;
-      snprintf(PrintBuf,sizeof(PrintBuf),"Loops pro Sek.:%d\r\n", LoopCounter);
-      LoopCounter=0;
+      snprintf(PrintBuf,sizeof(PrintBuf),"Thinkbee msg: %u\r\n", (uint)Msg);
       SerialOut(PrintBuf);
+      Msg=0;
+      MsgReady=0;
     }
-    HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, Pin);
-    LastPin=Pin;
-    LoopCounter++;
   }
+
 
   //GPIO_PinState rfi = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4);
 }
@@ -270,7 +196,7 @@ int DecodeMsg(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t aBitSeqCounter, uint
 void GetBitTimes(enum BitTimes bt, struct MinMaxBitTimes* aMinMax)
 {
   // Zulässige Abweichung in Prozent von der Nominalbitlaufzeit nach oben und unten
-  int Diff=30;
+  int Diff=20;
   aMinMax->Min=((int)bt*(100-Diff))/100;
   aMinMax->Max=((int)bt*(100+Diff))/100;
 }
@@ -280,6 +206,94 @@ int HammingWeight( uint8_t b )
   b = b - ((b >> 1) & 0x55);
   b = (b & 0x33) + ((b >> 2) & 0x33);
   return (((b + (b >> 4)) & 0x0F) * 0x01);
+}
+
+
+/**
+  * @brief  Conversion complete callback in non blocking mode
+  * @param  htim : hadc handle
+  * @retval None
+  */
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+  if (MsgReady==1)
+  {
+    // Keine weitere Aktion mehr, solange das Hauptprogramm die letzte Msg nicht verarbeitet hat!
+    return;
+  }
+  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+  {
+    // Fallende Flanke (Pin ist aktuell LOW)
+    CurrentTime = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+    PinState=0;
+  }
+  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+  {
+    // Steigende Flanke (Pin ist aktuell HIGH)
+    CurrentTime = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+    PinState=1;
+  }
+
+  if (CurrentTime > PreviousTime)
+  {
+    DiffTime = (CurrentTime - PreviousTime);
+  }
+  else if (CurrentTime < PreviousTime)
+  {
+    DiffTime = ((0xFFFF - PreviousTime) + CurrentTime) + 1;
+  }
+  else
+  {
+    // Gleichheit nicht vorgesehen ;-)
+    return;
+  }
+  PreviousTime=CurrentTime;
+  HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
+
+  TimeDiffs[SeqCount % 100]=DiffTime; // Capturezeit in Mikrosekunden
+
+  if (SeqCount<COUNTOF(StartSequence))
+  {
+    erg=DecodeStart(PinState, DiffTime, SeqCount);
+    if (erg==1)
+    {
+      int Detect=1;
+    }
+    //SerialOut("Thinkbee Start detektiert!\r\n");
+  }
+  else
+  {
+    // Jetzt folgen noch 34 Datenbits (evtl. gehören  auch noch welche zur Startsequenz oder umgekehrt)
+    erg=DecodeMsg(PinState, DiffTime, BitSeqCounter, &BitState);
+    if (erg==1)
+    {
+      Msg|=(BitState << BitCounter);
+      BitCounter++;
+    }
+    BitSeqCounter++;
+  }
+
+  SeqCount++;
+
+  if (BitCounter==NumMsgBits)
+  {
+    MsgReady=1;
+    BitSeqCounter=0;
+    BitCounter=0;
+    SeqCount=0;
+  }
+
+  if (erg==-1)
+  {
+    // Dekodierungsfehler aufgetreten
+    BitSeqCounter=0;
+    BitCounter=0;
+    Msg=0;
+    SeqCount=0;
+  }
+
+  return;
 }
 
 /**
@@ -305,32 +319,48 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = uwPrescalerValue;  // Timer zählt mit 1 MHz hoch
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 999;     // Bei 1000 wird ein IRQ ausgelöst -> 1 kHz-Timer
+  htim2.Init.Period = 0xffff;     // Zählt bis ca. 65 ms
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  if (HAL_TIM_IC_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
   }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+
+  /* Configure the Input Capture channel ################################*/
+  /* Configure the Input Capture of channel 1 */
+  sICConfig1.ICPolarity  = TIM_ICPOLARITY_FALLING;
+  sICConfig1.ICSelection = TIM_ICSELECTION_INDIRECTTI;
+  sICConfig1.ICPrescaler = TIM_ICPSC_DIV1;
+  sICConfig1.ICFilter    = 0;
+  if(HAL_TIM_IC_ConfigChannel(&htim2, &sICConfig1, TIM_CHANNEL_1) != HAL_OK)
   {
+    /* Configuration Error */
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  /*##-2- Configure the Input Capture channel ################################*/
+  /* Configure the Input Capture of channel 2 */
+  sICConfig2.ICPolarity  = TIM_ICPOLARITY_RISING;
+  sICConfig2.ICSelection = TIM_ICSELECTION_DIRECTTI;
+  sICConfig2.ICPrescaler = TIM_ICPSC_DIV1;
+  sICConfig2.ICFilter    = 0;
+  if(HAL_TIM_IC_ConfigChannel(&htim2, &sICConfig2, TIM_CHANNEL_2) != HAL_OK)
   {
+    /* Configuration Error */
     Error_Handler();
   }
-  /* USER CODE BEGIN TIM2_Init 2 */
-  if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
+
+  /*##-3- Start the Input Capture in interrupt mode ##########################*/
+  if(HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK)
   {
     /* Starting Error */
     Error_Handler();
   }
-
-  /* USER CODE END TIM2_Init 2 */
+  if(HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_2) != HAL_OK)
+  {
+    /* Starting Error */
+    Error_Handler();
+  }
 
 }
 
