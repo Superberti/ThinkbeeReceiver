@@ -111,6 +111,8 @@ struct MinMaxBitTimes
 };
 
 void GetBitTimes(enum BitTimes bt, struct MinMaxBitTimes*);
+int DecodeStart(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t SeqCount);
+int DecodeMsg(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t SeqCount, uint8_t*);
 
 
 

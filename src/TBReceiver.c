@@ -62,6 +62,10 @@ volatile int smMinBufPos=256;
 volatile int smMaxBufPos=0;
 volatile uint64_t smDMACounter=0;
 
+// Diese Sequenz wird immer gesendet, danach kann man suchen
+const enum BitTimes StartSequence[14]= {HIGH_LONG, LOW_PAUSE, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG, HIGH_SHORT, LOW_SHORT, HIGH_SHORT, LOW_LONG};
+static struct MinMaxBitTimes HighShort, HighLong, LowShort, LowLong, LowPause;
+
 /**
   * @brief  Main program
   * @param  None
@@ -107,21 +111,29 @@ int main(void)
 
   MX_TIM2_Init();
 
-  uint32_t Mikroseconds, UpdateTime, LastTime, TimeDiff, LargestLow=0, LargestHigh=0, PacketCounter=0, PacketCounterLow, PacketCounterHigh;
-  uint32_t PulseTimeHigh=0, PulseTimeLow=0;
+  uint32_t Mikroseconds, UpdateTime, LastTime, TimeDiff, PacketCounter=0;
+  uint32_t TimeDiffs[100]={};
   uint8_t Pin, LastPin;
-  uint32_t TimeDiffs[10];
+
   LastTime=GetMicros();//MillisCounter*1000 + TIM2->CNT;
   UpdateTime=LastTime;
   LastPin=0;
-  enum ReaderState rs=RS_INIT;
-  struct MinMaxBitTimes HighShort, HighLong, LowShort, LowLong, LowPause;
+
+
   GetBitTimes(HIGH_SHORT, &HighShort);
   GetBitTimes(HIGH_LONG, &HighLong);
   GetBitTimes(LOW_SHORT, &LowShort);
   GetBitTimes(LOW_LONG, &LowLong);
   GetBitTimes(LOW_PAUSE, &LowPause);
 
+  uint32_t SeqCount=0;
+  uint32_t BitSeqCounter=0;
+  uint32_t BitCounter=0;
+  uint64_t Msg=0;
+  int erg;
+  const uint32_t NumMsgBits=34;
+  uint8_t BitState;
+  uint32_t LoopCounter=0;
   while(1)
   {
     Mikroseconds = GetMicros();//MillisCounter*1000 + TIM2->CNT;
@@ -131,60 +143,134 @@ int main(void)
     {
       PacketCounter++;
       TimeDiff=Mikroseconds-LastTime;
-      TimeDiffs[PacketCounter%10]=TimeDiff;
-      /*
-      if (TimeDiff<0)
-      {
-        SerialOut("TimeDiff<0\r\n");
-      }
-      else if (TimeDiff>1000000)
-      {
-        SerialOut("TimeDiff>1000000\r\n");
-      }*/
+      TimeDiffs[SeqCount % 100]=TimeDiff;
       LastTime=Mikroseconds;
-      if (Pin)
+      if (SeqCount<COUNTOF(StartSequence))
       {
-        PacketCounterLow=PacketCounter;
-        // Übergang Low->High
-        PulseTimeLow=TimeDiff;
-        LargestLow=max(LargestLow,PulseTimeLow);
-        if (TimeDiff>LowPause.Min && TimeDiff<LowPause.Max && rs==RS_HIGH_LONG)
-          rs=RS_LOW_PAUSE;
-        else
-          rs=RS_INIT;
+        erg=DecodeStart(Pin, TimeDiff, SeqCount);
+        //if (erg==1)
+          //SerialOut("Thinkbee Start detektiert!\r\n");
       }
       else
       {
-        PacketCounterHigh=PacketCounter;
-        // Übergang High->Low
-        PulseTimeHigh=TimeDiff;
-        LargestHigh=max(LargestHigh,PulseTimeHigh);
-        if (TimeDiff>HighLong.Min && TimeDiff<HighLong.Max && rs==RS_INIT)
-          rs=RS_HIGH_LONG;
+        // Jetzt folgen noch 34 Datenbits (evtl. gehören  auch noch welche zur Startsequenz oder umgekehrt)
+        erg=DecodeMsg(Pin, TimeDiff, BitSeqCounter, &BitState);
+        if (erg==1)
+        {
+          Msg|=(BitState << BitCounter);
+          BitCounter++;
+        }
+        BitSeqCounter++;
       }
-      if (rs==RS_LOW_PAUSE)
+
+      SeqCount++;
+
+      if (BitCounter==NumMsgBits)
       {
-        SerialOut("Thinkbee Paket detektiert!\r\n");
-        rs=RS_INIT;
+        snprintf(PrintBuf,sizeof(PrintBuf),"Thinkbee Paket detektiert: %llu\r\n", Msg);
+        SerialOut(PrintBuf);
+        BitSeqCounter=0;
+        BitCounter=0;
+        Msg=0;
+        SeqCount=0;
+        continue;
       }
+
+      if (erg==-1)
+      {
+        if (SeqCount>10)
+        {
+          snprintf(PrintBuf,sizeof(PrintBuf),"Sequenz abgebrochen nach %u Bitzeiten, BC: %d: \r\n", SeqCount, BitCounter);
+          SerialOut(PrintBuf);
+          for (int i=0;i<SeqCount && i<100;i++)
+          {
+            snprintf(PrintBuf,sizeof(PrintBuf),"%u ", TimeDiffs[i]);
+            SerialOut(PrintBuf);
+          }
+          SerialOut("\r\n");
+        }
+        // Dekodierungsfehler aufgetreten
+        BitSeqCounter=0;
+        BitCounter=0;
+        Msg=0;
+        SeqCount=0;
+        continue;
+      }
+
+
     }
-    /*
+
+
     if (Mikroseconds-UpdateTime>=1000000)
     {
       UpdateTime=Mikroseconds;
-      snprintf(PrintBuf,sizeof(PrintBuf),"LargestLow: %u µs LargestHigh: %u µs\r\n", LargestLow, LargestHigh);
+      snprintf(PrintBuf,sizeof(PrintBuf),"Loops pro Sek.:%d\r\n", LoopCounter);
+      LoopCounter=0;
       SerialOut(PrintBuf);
-    }*/
+    }
     HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, Pin);
     LastPin=Pin;
+    LoopCounter++;
   }
 
   //GPIO_PinState rfi = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4);
 }
 
+int DecodeStart(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t SeqCount)
+{
+  if (SeqCount>=COUNTOF(StartSequence))
+    return -1;
+
+  // Einzuhaltene Bitzeiten holen
+  struct MinMaxBitTimes SeqTimes;
+  GetBitTimes(StartSequence[SeqCount], &SeqTimes);
+  if (aTimeDiff_ys<SeqTimes.Min || aTimeDiff_ys>SeqTimes.Max)
+    return -1;  // Dekodierfehler
+  if (SeqCount==COUNTOF(StartSequence)-1)
+    return 1; // Startsequenz korrekt erkannt
+  else
+    return 0; // Startsequenz ist noch nicht zu Ende
+}
+
+int DecodeMsg(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t aBitSeqCounter, uint8_t* aBitState)
+{
+  // In der Datenphase darf es nur drei gültige Zustände geben:
+  // HIGH_SHORT gefolgt von LOW_SHORT (=0) oder LOW_LONG (=1)
+
+  // Eine Bitsequenz muss immer mit HIGH_SHORT anfangen!
+  if (aBitSeqCounter % 2)
+  {
+    // Counter=ungerade, also Pausen ansehen (Pause wurde gemessen, wenn Pin auf HIGH ist)
+    if (!aPin)
+      return -1;  // Dekodierfehler
+    if (aTimeDiff_ys>=LowShort.Min && aTimeDiff_ys<=LowShort.Max)
+    {
+      *aBitState=0;
+      return 1; // Bit fertig
+    }
+    else if (aTimeDiff_ys>=LowLong.Min && aTimeDiff_ys<=LowLong.Max)
+    {
+      *aBitState=1;
+      return 1; // Bit fertig
+    }
+    else
+      return -1; // Dekodierfehler
+  }
+  else
+  {
+    // Counter=gerade, High-Zeit messen (Pin ist auf LOW gegangen)
+    if (aPin)
+      return -1; // Dekodierfehler
+    if (aTimeDiff_ys<HighShort.Min || aTimeDiff_ys>HighShort.Max)
+      return -1;  // Dekodierfehler
+  }
+  return 0;
+}
+
 void GetBitTimes(enum BitTimes bt, struct MinMaxBitTimes* aMinMax)
 {
-  int Diff=5;
+  // Zulässige Abweichung in Prozent von der Nominalbitlaufzeit nach oben und unten
+  int Diff=30;
   aMinMax->Min=((int)bt*(100-Diff))/100;
   aMinMax->Max=((int)bt*(100+Diff))/100;
 }
