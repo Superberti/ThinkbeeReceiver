@@ -1,5 +1,4 @@
-## ThinkbeeReceiver
-#Thinkbee Funkprotokoll Empfänger
+## ThinkbeeReceiver - Thinkbee Funkprotokoll Empfänger
 
 Dieses kleine Demonstrationsprogramm kann das Funkprotokoll der s.g. Thinkbee-Schalter demodulieren.
 Als Hardware wurde ein Nucleo-32 (STM32L031) verwendet, da gerade vorhanden. 
