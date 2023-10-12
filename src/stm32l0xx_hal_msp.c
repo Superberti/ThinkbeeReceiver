@@ -22,8 +22,7 @@
 #include "TBReceiver.h"
 
 /* USER CODE BEGIN Includes */
-extern DMA_HandleTypeDef hdma_spi1_rx;
-extern DMA_HandleTypeDef hdma_spi1_tx;
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

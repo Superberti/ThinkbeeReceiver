@@ -1,5 +1,5 @@
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
+#ifndef TBRECEIVER_H_INCLUDED
+#define TBRECEIVER_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,4 +78,4 @@ int DecodeMsg(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t SeqCount, uint8_t*);
 }
 #endif
 
-#endif /* MAIN_H_INCLUDED */
+#endif /* TBRECEIVER_H_INCLUDED */

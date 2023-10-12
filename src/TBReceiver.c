@@ -67,7 +67,7 @@ int main(void)
 
   HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
 
-  SerialOut("\r\nThinkBee Receiver started!\r\n");
+  SerialOut("\r\nThinkBee-Empfänger gestartet!\r\n");
 
   GetBitTimes(HIGH_SHORT, &HighShort);
   GetBitTimes(HIGH_LONG, &HighLong);
@@ -81,7 +81,7 @@ int main(void)
   {
     if (MsgReady)
     {
-      snprintf(PrintBuf,sizeof(PrintBuf),"Thinkbee msg: %u\r\n", (uint)Msg);
+      snprintf(PrintBuf,sizeof(PrintBuf),"Thinkbee Datenwort: %u\r\n", (uint)Msg);
       SerialOut(PrintBuf);
       Msg=0;
       MsgReady=0;
@@ -89,22 +89,37 @@ int main(void)
   }
 }
 
-int DecodeStart(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t SeqCount)
+/**
+  * @brief Startsequenz überprüfen
+  * @param aPin Pin-Zustand direkt nach der Messung (Pin ist High -> Low-Phase gemessen und umgekehrt)
+  * @param aTimeDiff_ys Gemessene Zeit zwischen zwei Flanken
+  * @param aBitSeqCounter Laufende Bitsequenznummer, wird bei jedem Flankenwechsel erhöht
+  * @return -1: Dekodierfehler, 0: OK, aber noch nicht fertig, 1: OK und fertig
+  */
+int DecodeStart(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t aBitSeqCounter)
 {
-  if (SeqCount>=COUNTOF(StartSequence))
+  if (aBitSeqCounter>=COUNTOF(StartSequence))
     return -1;
 
   // Einzuhaltene Bitzeiten holen
   struct MinMaxBitTimes SeqTimes;
-  GetBitTimes(StartSequence[SeqCount], &SeqTimes);
+  GetBitTimes(StartSequence[aBitSeqCounter], &SeqTimes);
   if (aTimeDiff_ys<SeqTimes.Min || aTimeDiff_ys>SeqTimes.Max)
     return -1;  // Dekodierfehler
-  if (SeqCount==COUNTOF(StartSequence)-1)
+  if (aBitSeqCounter==COUNTOF(StartSequence)-1)
     return 1; // Startsequenz korrekt erkannt
   else
     return 0; // Startsequenz ist noch nicht zu Ende
 }
 
+/**
+  * @brief Bits der Datenphase Dekodieren
+  * @param aPin Pin-Zustand direkt nach der Messung (Pin ist High -> Low-Phase gemessen und umgekehrt)
+  * @param aTimeDiff_ys Gemessene Zeit zwischen zwei Flanken
+  * @param aBitSeqCounter Laufende Bitsequenznummer, wird bei jedem Flankenwechsel erhöht
+  * @retval aBitState Rückgabe High- oder Lowbit
+  * @return -1: Dekodierfehler, 0: OK, aber noch nicht fertig, 1: OK und fertig
+  */
 int DecodeMsg(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t aBitSeqCounter, uint8_t* aBitState)
 {
   // In der Datenphase darf es nur drei gültige Zustände geben:
@@ -140,6 +155,11 @@ int DecodeMsg(uint8_t aPin, uint32_t aTimeDiff_ys, uint32_t aBitSeqCounter, uint
   return 0;
 }
 
+/**
+  * @brief Min- und Maximalzeiten der verschiedenen Bitlaufzeiten ermitteln
+  * @param bt Laufzeitart
+  * @retval aMinMax Rückgabe minimale und maximale Laufzeit
+  */
 void GetBitTimes(enum BitTimes bt, struct MinMaxBitTimes* aMinMax)
 {
   // Zulässige Abweichung in Prozent von der Nominalbitlaufzeit nach oben und unten
@@ -148,7 +168,11 @@ void GetBitTimes(enum BitTimes bt, struct MinMaxBitTimes* aMinMax)
   aMinMax->Max=((int)bt*(100+Diff))/100;
 }
 
-// IRQ-Callback für beide Flanken
+/**
+  * @brief IRQ-Callback für beide Flanken. Misst die Low- und High-Zeiten
+  * @param htim Pointer auf Timer2
+  * @retval None
+  */
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
   if (MsgReady==1)
